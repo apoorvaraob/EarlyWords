@@ -1,0 +1,20 @@
+{
+  "name": "03-bart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bart": "0.0.3",
+    "express": "^4.16.4",
+    "nodemon": "^1.19.3",
+    "socket.io": "^2.2.0"
+  },
+  "engines": {
+    "node": "11.1.0"
+  }
+}
