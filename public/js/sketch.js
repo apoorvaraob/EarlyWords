@@ -1,93 +1,114 @@
+// P_2_3_3_01 modified to use NYT API Data. 
+//
+// Generative Gestaltung – Creative Coding im Web
+// ISBN: 978-3-87439-902-9, First Edition, Hermann Schmidt, Mainz, 2018
+// Benedikt Groß, Hartmut Bohnacker, Julia Laub, Claudius Lazzeroni
+// with contributions by Joey Lee and Niels Poldervaart
+// Copyright 2018
+//
+// http://www.generative-gestaltung.de
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * draw tool. shows how to draw with dynamic elements.
+ *
+ * MOUSE
+ * drag                : draw with text
+ *
+ * KEYS
+ * del, backspace      : clear screen
+ * arrow up            : angle distortion +
+ * arrow down          : angle distortion -
+ * s                   : save png
+ */
+'use strict';
+
+var x = 0;
+var y = 0;
+var stepSize = 5.0;
+
+var font = 'Georgia';
+var fontSizeMin = 3;
+var angleDistortion = 0.0;
+var counter = 0;
+
 // --------------------------------------------------------
-// 03-bart
+// NYT developer API Calls 
 // --------------------------------------------------------
 let socket;
-let stationData;
-
+let NYTdata;
 
 function setup() {
-  createCanvas(window.innerWidth, 2560);
+  // use full screen size
+  createCanvas(displayWidth, displayHeight);
+  background(255);
+  cursor(CROSS);
 
+  x = mouseX;
+  y = mouseY;
+
+  textFont(font);
+  textAlign(LEFT);
+  fill(0);
   // this works if you're running your server on the same port
   // if you're running from a separate server on a different port
   // you'll need to pass in the address to connect()
   socket = io.connect(); 
 
   // we listen for message on the socket server called 'data'
-  socket.on('stationUpdate',
+  socket.on('dataReceivedEvent',
     (data) => {
-      console.log('station update: ', data);
-      stationData = data;
+      console.log('NYT data: ', data.description);
+      NYTdata = data.description;
     }
   );
 }
 
-// --------------------------------------------------------
-function windowResized() {
-  resizeCanvas(window.innerWidth, 2560);
-}
-
-// --------------------------------------------------------
-function getColor(colData) {
-  let colorVal;
-  switch(colData) {
-    case "YELLOW":
-      colorVal = color(254, 221, 0);
-      break;
-    
-    case "RED":
-      colorVal = color(225, 11, 83);
-      break;
-    
-    case "GREEN":
-      colorVal = color(72, 180, 65);
-      break;
-    
-    case "BLUE":
-      colorVal = color(0, 173, 239);
-      break;
-    
-    default:
-      colorVal = color(0, 0, 0);
-  }
-
-  return colorVal;
-}
-
-// --------------------------------------------------------
 function draw() {
-  background(255);
-  strokeWeight(0);
-  
-  // Station data comes back in arrays of 21
-  let x = 40;
-  let y = 40;
+  if (mouseIsPressed && mouseButton == LEFT) {
+    var d = dist(x, y, mouseX, mouseY);
+    textSize(fontSizeMin + d / 2);
+    var newLetter = NYTdata.charAt(counter);
+    stepSize = textWidth(newLetter);
 
-  if (stationData && stationData.length > 0) {
-    textAlign(LEFT);
-    for (let i = 0; i < 21; i++) {
-      fill(getColor(stationData[i]["color"]));
-      rect(x, y, 80, 80);
-      
-      fill(0);
-      textSize(18);
-      text(stationData[i]["destination"], x + 100, y + 20);
+    if (d > stepSize) {
+      var angle = atan2(mouseY - y, mouseX - x);
 
-      if (stationData[i]["minutes"] == 0) {
-        fill(225, 11, 83);
-        text("TRAIN APPROACHING", x + 100, y + 45);
-        fill(0);
-      } else {
-        text("in " + stationData[i]["minutes"] + " minutes", x + 100, y + 45);
-      }
+      push();
+      translate(x, y);
+      rotate(angle + random(angleDistortion));
+      text(newLetter, 0, 0);
+      pop();
 
-      text(stationData[i]["direction"] + ", Platform #" + stationData[i]["platform"], x + 100, y + 70);
+      counter++;
+      if (counter >= NYTdata.length) counter = 0;
 
-      y+= 120;
+      x = x + cos(angle) * stepSize;
+      y = y + sin(angle) * stepSize;
     }
-  } else {
-    textSize(24);
-    text('Waiting for BART data...', width/2, 300);
-    textAlign(CENTER);
   }
+}
+
+function mousePressed() {
+  x = mouseX;
+  y = mouseY;
+}
+
+function keyReleased() {
+  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
+  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
+}
+
+function keyPressed() {
+  // angleDistortion ctrls arrowkeys up/down
+  if (keyCode == UP_ARROW) angleDistortion += 0.1;
+  if (keyCode == DOWN_ARROW) angleDistortion -= 0.1;
 }
