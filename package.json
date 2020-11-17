@@ -1,5 +1,5 @@
 {
-  "name": "nyt_app",
+  "name": "first_words_app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,6 @@
   "dependencies": {
     "express": "^4.17.1",
     "nodemon": "2.0.4",
-    "nyt": "^0.1.0",
     "pug": "^3.0.0",
     "socket.io": "^2.2.0"
   },

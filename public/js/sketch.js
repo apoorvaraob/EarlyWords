@@ -1,114 +1,61 @@
-// P_2_3_3_01 modified to use NYT API Data. 
-//
-// Generative Gestaltung – Creative Coding im Web
-// ISBN: 978-3-87439-902-9, First Edition, Hermann Schmidt, Mainz, 2018
-// Benedikt Groß, Hartmut Bohnacker, Julia Laub, Claudius Lazzeroni
-// with contributions by Joey Lee and Niels Poldervaart
-// Copyright 2018
-//
-// http://www.generative-gestaltung.de
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * draw tool. shows how to draw with dynamic elements.
- *
- * MOUSE
- * drag                : draw with text
- *
- * KEYS
- * del, backspace      : clear screen
- * arrow up            : angle distortion +
- * arrow down          : angle distortion -
- * s                   : save png
- */
-'use strict';
-
-var x = 0;
-var y = 0;
-var stepSize = 5.0;
-
-var font = 'Georgia';
-var fontSizeMin = 3;
-var angleDistortion = 0.0;
-var counter = 0;
-
-// --------------------------------------------------------
-// NYT developer API Calls 
-// --------------------------------------------------------
-let socket;
-let NYTdata;
+let er1, er2;
 
 function setup() {
-  // use full screen size
-  createCanvas(displayWidth, displayHeight);
-  background(255);
-  cursor(CROSS);
-
-  x = mouseX;
-  y = mouseY;
-
-  textFont(font);
-  textAlign(LEFT);
-  fill(0);
-  // this works if you're running your server on the same port
-  // if you're running from a separate server on a different port
-  // you'll need to pass in the address to connect()
-  socket = io.connect(); 
-
-  // we listen for message on the socket server called 'data'
-  socket.on('dataReceivedEvent',
-    (data) => {
-      console.log('NYT data: ', data.description);
-      NYTdata = data.description;
-    }
-  );
+  createCanvas(640, 360);
+  er1 = new EggRing(width*0.45, height*0.5, 0.1, 120);
+  er2 = new EggRing(width*0.65, height*0.8, 0.05, 180);
 }
 
 function draw() {
-  if (mouseIsPressed && mouseButton == LEFT) {
-    var d = dist(x, y, mouseX, mouseY);
-    textSize(fontSizeMin + d / 2);
-    var newLetter = NYTdata.charAt(counter);
-    stepSize = textWidth(newLetter);
+  background(0);
+  er1.transmit();
+  er2.transmit();
+}
 
-    if (d > stepSize) {
-      var angle = atan2(mouseY - y, mouseX - x);
+class Egg {
+  constructor(xpos, ypos, t, s) {
+    this.x = xpos;
+    this.y = ypos;
+    this.tilt = t;
+    this.scalar = s / 100.0;
+    this.angle = 0.0;
+  }
 
-      push();
-      translate(x, y);
-      rotate(angle + random(angleDistortion));
-      text(newLetter, 0, 0);
-      pop();
+  wobble() {
+    this.tilt = cos(this.angle) / 8;
+    this.angle += 0.1;
+  }
 
-      counter++;
-      if (counter >= NYTdata.length) counter = 0;
-
-      x = x + cos(angle) * stepSize;
-      y = y + sin(angle) * stepSize;
-    }
+  display() {
+    noStroke();
+    fill(255);
+    push();
+    translate(this.x, this.y);
+    rotate(this.tilt);
+    scale(this.scalar);
+    beginShape();
+    vertex(0, -100);
+    bezierVertex(25, -100, 40, -65, 40, -40);
+    bezierVertex(40, -15, 25, 0, 0, 0);
+    bezierVertex(-25, 0, -40, -15, -40, -40);
+    bezierVertex(-40, -65, -25, -100, 0, -100);
+    endShape();
+    pop();
   }
 }
 
-function mousePressed() {
-  x = mouseX;
-  y = mouseY;
-}
 
-function keyReleased() {
-  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
-  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
-}
+class EggRing {
+  constructor(x, y, t, sp) {
+    this.x = x;
+    this.y = y;
+    this.t = t;
+    this.sp = sp;
+    this.ovoid = new Egg(this.x, this.y, this.t, this.sp);
+  }
 
-function keyPressed() {
-  // angleDistortion ctrls arrowkeys up/down
-  if (keyCode == UP_ARROW) angleDistortion += 0.1;
-  if (keyCode == DOWN_ARROW) angleDistortion -= 0.1;
+  transmit() {
+    this.ovoid.wobble();
+    this.ovoid.display();
+  }
 }
