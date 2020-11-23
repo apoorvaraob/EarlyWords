@@ -2,20 +2,27 @@
 let er1, er2, er3;
 let tableData = [];
 let def_data = [];
-let tables = ['views/item_data.csv',
-              'views/item_data-2.csv',
-              'views/item_data-3.csv',
-              'views/item_data-4.csv',
-              'views/item_data-5.csv',
-              'views/item_data-6.csv',
-              'views/item_data-7.csv']
+let tables = ['data/item_data.csv',
+              'data/item_data-2.csv',
+              'data/item_data-3.csv',
+              'data/item_data-4.csv',
+              'data/item_data-5.csv',
+              'data/item_data-6.csv',
+              'data/item_data-7.csv']
 
 const MAX_EGGS = 20;
 let eggs = [];
+let index = 0;
+let baby_sounds;
+let egg_cracking;
+
 p5.disableFriendlyErrors = true;
 
 function preload(){
-  //song = loadSound('assets/lucky_dragons_-_power_melody.mp3');
+  soundFormats('mp3');
+  baby_sounds = loadSound('assets/baby_babbling.mp3');
+  egg_cracking = loadSound('assets/eggs_cracking.mp3');
+
   for(i = 0; i < tables.length; i++){
     tableData.push(loadTable(tables[i], 'csv', 'header'));
   }
@@ -23,35 +30,65 @@ function preload(){
 
 function setup() {
   console.log("pre load complete");
+  
+  //egg_cracking.play();
+  //baby_sounds.play();
+  button = createButton("play");
+  button.mousePressed(togglePlaying);
 
   createCanvas(640, 360);
   //song.loop(); // song is ready to play during setup() because it was loaded during preload
   for(i = 0; i < MAX_EGGS; i++){
-    eggs.push(new Egg(width * random(1), height * random(1), random(0.25), random(60)));
+    eggs.push(new Egg(width * random(1), height * random(1), random(0.25), random(80)));
   }
 
   for(i = 0; i < tables.length; i++){
     def_data.push(tableData[i].getColumn('definition'));
   }
 
-  console.log("def data loaded");
+  console.log("all words loaded");
   console.log(def_data);
 
 }
 
-function getEggText(){
+function togglePlaying() {
+  if(!baby_sounds.isPlaying()) {
+    egg_cracking.play();
+    egg_cracking.setVolume(1.0);
+    baby_sounds.play();
+    baby_sounds.setVolume(0.7);
+    button.html("pause");
+  } else {
+    egg_cracking.pause();
+    baby_sounds.pause();
+    button.html("play")
+  }
 
+}
+
+function getEggText(){
   language = round(random(tables.length));
   data = def_data[language];
-  word = round(random(500));  // all languages contain atleast 500 words each
-  return data[word];
-}
+
+  if (index <= 100) {
+    index++;
+    if( typeof data === "undefined")
+    { 
+      return "gaga";
+    } else {
+      return data[index];
+    }
+  } else {
+    index = 0; 
+    return "aaaa";
+  }
+} 
 
 function draw() {
   //background(0); // black
   //background(50, 89, 100); // teal
   background(255, 244, 79); // lemon yellow
-  console.log(eggs);
+  //console.log(eggs);
   for (i = 0; i< MAX_EGGS; i++){
     eggs[i].transmit();
   }
@@ -148,12 +185,18 @@ class Egg {
     vertex(0, 0);
     bezierVertex(-25, 0, -40, -15, -40, -40);
     bezierVertex(-40, -65, -25, -100, 0, -100);
-    vertex(0, 0); 
+    vertex(0, 0);
     vertex(15, -15);
     vertex(-10, -30); 
     vertex(20, -50);
     vertex(-13, -63);
     vertex(0, -100);
+
+    erase();
+    vertex(0, 0);
+    vertex(0, -100);
+    noErase();
+    
     endShape();
 
     this.cracked = false;
@@ -165,11 +208,10 @@ class Egg {
   }
 
   transmit() {
-    frameRate(5);
+    frameRate(3);
     this.wobble();
     this.display();
     this.crack();
     this.hatch(); 
     }
 }
-
