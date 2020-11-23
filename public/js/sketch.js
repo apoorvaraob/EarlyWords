@@ -1,7 +1,14 @@
+const MAX_EGGS = 20;
 
-let er1, er2, er3;
 let tableData = [];
 let def_data = [];
+let eggs = [];
+let index = 0;
+let baby_sounds;
+let egg_cracking;
+let amp;
+let track_amplitude = [];
+
 let tables = ['data/item_data.csv',
               'data/item_data-2.csv',
               'data/item_data-3.csv',
@@ -9,12 +16,6 @@ let tables = ['data/item_data.csv',
               'data/item_data-5.csv',
               'data/item_data-6.csv',
               'data/item_data-7.csv']
-
-const MAX_EGGS = 20;
-let eggs = [];
-let index = 0;
-let baby_sounds;
-let egg_cracking;
 
 p5.disableFriendlyErrors = true;
 
@@ -30,18 +31,20 @@ function preload(){
 
 function setup() {
   console.log("pre load complete");
-  
-  //egg_cracking.play();
-  //baby_sounds.play();
+
+  // Start sound
   button = createButton("play");
   button.mousePressed(togglePlaying);
+  amp = new p5.Amplitude();
 
+  // Start drawing
   createCanvas(640, 360);
-  //song.loop(); // song is ready to play during setup() because it was loaded during preload
+  
   for(i = 0; i < MAX_EGGS; i++){
     eggs.push(new Egg(width * random(1), height * random(1), random(0.25), random(80)));
   }
 
+  // Get data
   for(i = 0; i < tables.length; i++){
     def_data.push(tableData[i].getColumn('definition'));
   }
@@ -52,16 +55,20 @@ function setup() {
 }
 
 function togglePlaying() {
+  // Play or pause 
   if(!baby_sounds.isPlaying()) {
     egg_cracking.play();
     egg_cracking.setVolume(1.0);
     baby_sounds.play();
     baby_sounds.setVolume(0.7);
     button.html("pause");
+    loop();
   } else {
     egg_cracking.pause();
     baby_sounds.pause();
     button.html("play")
+    noLoop();
+
   }
 
 }
@@ -70,6 +77,7 @@ function getEggText(){
   language = round(random(tables.length));
   data = def_data[language];
 
+  // Get around browser limitations
   if (index <= 100) {
     index++;
     if( typeof data === "undefined")
@@ -85,14 +93,46 @@ function getEggText(){
 } 
 
 function draw() {
-  //background(0); // black
-  //background(50, 89, 100); // teal
+
   background(255, 244, 79); // lemon yellow
-  //console.log(eggs);
+
+  // Eggs
   for (i = 0; i< MAX_EGGS; i++){
     eggs[i].transmit();
   }
 
+  // Lawn
+  plotSoundVisualization();
+
+}
+
+function plotSoundVisualization() {
+  var vol = amp.getLevel();
+  track_amplitude.push(vol);
+  stroke(14, 164, 79);
+  strokeWeight(3);
+  beginShape();
+
+  // Use amplitude to determine the height of the grass
+  for (var i = 0; i < track_amplitude.length; i++) {
+    fill(154, 195, 69);
+    var y = map(track_amplitude[i], 0, 1, height, 0);
+    vertex(i, y);
+  }
+  endShape();
+
+  if(track_amplitude.length > width) {
+    // Get rid of the oldest point and add 
+    // a new one when we reach the end of the canvas
+    track_amplitude.splice(0, 1);
+  }
+  
+  stroke(123, 41, 167);
+
+  // vertical line marks where we are. 
+  line(track_amplitude.length, 0, track_amplitude.length, height);
+  
+  //ellipse(100, 100, 200, vol*200);
 }
 
 class Egg {
@@ -152,17 +192,11 @@ class Egg {
   }
 
   display() {
-    //noStroke();
-    //let c = color(212,175,55);
-    //let c = color(random(255), random(255), random(255));
-    //let c = color(201, 144, 31); // egg brown
+    noStroke();
     let c = color(255);
-    fill(c); // gold
-
+    fill(c); 
     push();
-
     this.eggText = "";
-    
     translate(this.x, this.y);
     rotate(this.tilt);
     scale(this.scalar);
@@ -208,7 +242,7 @@ class Egg {
   }
 
   transmit() {
-    frameRate(3);
+    frameRate(5);
     this.wobble();
     this.display();
     this.crack();
