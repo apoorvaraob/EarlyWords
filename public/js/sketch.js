@@ -109,7 +109,8 @@ function draw() {
 function plotSoundVisualization() {
   var vol = amp.getLevel();
   track_amplitude.push(vol);
-  stroke(14, 164, 79);
+  //stroke(14, 164, 79);
+  stroke(101, 163, 52);
   strokeWeight(3);
   beginShape();
 
