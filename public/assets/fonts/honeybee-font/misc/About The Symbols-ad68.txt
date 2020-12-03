@@ -1,0 +1,24 @@
+This font family contains special symbols for programs that support opentype features. 
+
+Type ** for the flower
+Type :) for the bee
+Type <3 for the heart
+Type <33 for the scribble heart
+Type <333 for the open heart
+Type I<3U for the Love symbol
+Type ## for the Honey symbol 
+
+Why aren't the special symbols working for me?
+
+You may be using a program that does not support opentype features, such as ms paint, open office, libre office, gimp, etc.
+
+Examples of programs that do support opentype features are: photoshop, illustrator, or microsoft word. If you are using one of these programs, make sure you have ligatures turned on.
+Paint.net is the only free program that I know of that shows the symbols.
+
+An alternative is to use my ding sets, as they contain all my special characters and should work in any program.
+
+MF Dings contains the special symbols for this font.
+
+If you have any questions, please contact me at misti.fonts@gmail.com
+
+Thanks!

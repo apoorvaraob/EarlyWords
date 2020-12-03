@@ -20,13 +20,24 @@ let tables = ['data/item_data.csv',
 p5.disableFriendlyErrors = true;
 
 function preload(){
+  
+  // Audio
   soundFormats('mp3');
   baby_sounds = loadSound('assets/baby_babbling.mp3');
   egg_cracking = loadSound('assets/eggs_cracking.mp3');
 
+  // Data
   for(i = 0; i < tables.length; i++){
     tableData.push(loadTable(tables[i], 'csv', 'header'));
   }
+
+  // Latin based Fonts
+  //eggTextFont = loadFont('assets/fonts/pizza/PizzaismyFAVORITE.ttf');
+  //eggTextFont = loadFont('assets/fonts/kindergarden/Kindergarden.ttf');
+  //eggTextFont = loadFont('assets/fonts/acki-preschool/AckiPreschool.ttf');
+  //eggTextFont = loadFont('assets/fonts/two-turtle-doves/doves.ttf');
+  //eggTextFont = loadFont('assets/fonts/moms-crafter-font/MomsCrafter-gxBE4.ttf')
+
 }
 
 function setup() {
@@ -38,7 +49,8 @@ function setup() {
   amp = new p5.Amplitude();
 
   // Start drawing
-  createCanvas(640, 360);
+  //createCanvas(640, 360);
+  createCanvas(windowWidth, windowHeight);
   
   for(i = 0; i < MAX_EGGS; i++){
     eggs.push(new Egg(width * random(1), height * random(1), random(0.25), random(80)));
@@ -52,14 +64,17 @@ function setup() {
   console.log("all words loaded");
   console.log(def_data);
 
+  // Text
+  //textFont(eggTextFont);
+  textSize(20);
 }
 
 function togglePlaying() {
   // Play or pause 
   if(!baby_sounds.isPlaying()) {
-    egg_cracking.play();
+    egg_cracking.loop();
     egg_cracking.setVolume(1.0);
-    baby_sounds.play();
+    baby_sounds.loop();
     baby_sounds.setVolume(0.7);
     button.html("pause");
     loop();
@@ -76,6 +91,14 @@ function togglePlaying() {
 function getEggText(){
   language = round(random(tables.length));
   data = def_data[language];
+
+  /*
+  if(language == 1 || language == 3 || language == 4 || language == 5 || language == 6){
+    textFont(eggTextFont);
+  } else {
+    textFont();
+  }
+  */
 
   // Get around browser limitations
   if (index <= 100) {
@@ -95,6 +118,7 @@ function getEggText(){
 function draw() {
 
   background(255, 244, 79); // lemon yellow
+  //background(241, 228, 174); // dark sky blue
 
   // Eggs
   for (i = 0; i< MAX_EGGS; i++){
