@@ -9,29 +9,27 @@ let egg_cracking;
 let amp;
 let track_amplitude = [];
 let rotationAngle = 1.0;
-let planeAngle = 1.0;
 let cam;
 let delta = 0.01;
 let wordAcquired;
 let background_image; 
 
-let tables = ['data/item_data.csv',
-              'data/item_data-2.csv',
-              'data/item_data-3.csv',
-              'data/item_data-4.csv',
-              'data/item_data-5.csv',
-              'data/item_data-6.csv',
-              'data/item_data-7.csv']
+let tables = ['data_Stanford_WordBank_Nov2020/kigiriama.csv', //1
+              'data_Stanford_WordBank_Nov2020/chinese.csv', //2
+              'data_Stanford_WordBank_Nov2020/croatian.csv', //3
+              'data_Stanford_WordBank_Nov2020/english.csv', //4
+              'data_Stanford_WordBank_Nov2020/norwegian.csv', //5
+              'data_Stanford_WordBank_Nov2020/russian.csv', //6
+              'data_Stanford_WordBank_Nov2020/german.csv'] //7
 
 p5.disableFriendlyErrors = true;
 
 function preload(){
 
   three_d_egg = loadModel('assets/3d_objects/white_egg_by_Andreas_Piel.obj');
-  //grass = loadModel('assets/3d_objects/grass_low_poly.obj');
   egg_texture = loadImage('assets/3d_objects/egg_texture.png');
   grass_texture = loadImage('assets/3d_objects/grass_texture.jpg');
-  //background_image = loadImage('assets/images/stock_characters.png');
+  background_image = loadImage('assets/images/stock_characters.png');
 
   // Audio
   soundFormats('mp3');
@@ -43,12 +41,9 @@ function preload(){
     tableData.push(loadTable(tables[i], 'csv', 'header'));
   }
 
-  // Latin based Fonts
-  eggTextFont = loadFont('assets/fonts/pizza/PizzaismyFAVORITE.ttf');
-  //eggTextFont = loadFont('assets/fonts/kindergarden/Kindergarden.ttf');
-  //eggTextFont = loadFont('assets/fonts/acki-preschool/AckiPreschool.ttf');
-  //eggTextFont = loadFont('assets/fonts/two-turtle-doves/doves.ttf');
-  //eggTextFont = loadFont('assets/fonts/moms-crafter-font/MomsCrafter-gxBE4.ttf')
+  // Japanese fonts for the most coverage
+  //eggTextFont = loadFont('assets/fonts/Noto_Sans_JP/NotoSansJP-Light.otf');
+  eggTextFont = loadFont('assets/fonts/chi_jyun/ちはや純.ttf')
 
 }
 
@@ -85,12 +80,12 @@ function setup() {
   cam.pan(-0.6);
   */
 
-  wordAcquired = createGraphics(200, 200);
-  wordAcquired.background(egg_texture);
-  wordAcquired.fill(255, 100);
-  wordAcquired.textAlign(CENTER);
-  wordAcquired.textSize(20);
-  wordAcquired.text('new word', 100, 150); 
+  //wordAcquired = createGraphics(200, 200);
+  //wordAcquired.background(background_image);
+  //wordAcquired.fill(255, 100);
+  //wordAcquired.textAlign(CENTER);
+  //wordAcquired.textSize(20);
+  //wordAcquired.text('new word', 100, 150); 
   
 }
 
@@ -117,18 +112,7 @@ function getEggText(){
   language = round(random(tables.length));
   data = def_data[language];
 
-  /*
-  if(language == 1 
-    || language == 3 
-    || language == 4 
-    || language == 5 
-    || language == 6){
-    textFont(eggTextFont);
-  } else {
-    textFont();
-  }
-  */
-  // Get around browser limitations
+  // Get around browser limitations since raw data is large
   if (index <= 100) {
     index++;
     if( typeof data === "undefined")
@@ -145,11 +129,11 @@ function getEggText(){
 
 function draw() {
 
-  frameRate(5);
+  frameRate(3);
   
   //background(255, 244, 79); // lemon yellow
   background(135, 206, 235); // sky blue
-  //background(background_image);
+  //background(background_image); // won't work in 3D. 
 
   rectMode(CENTER);
   ambientLight(255);
@@ -159,7 +143,6 @@ function draw() {
 
   for (i = 0; i< MAX_EGGS; i++){
     make3DEgg();
-    //makeLawnWithEffects();
     addWordsToCanvas();
   }
 
@@ -171,7 +154,7 @@ function draw() {
   let cameraZ = (height / 2.0)/ tan ((PI/3)/2);
   perspective(fov, width / height, cameraZ / 10.0, cameraZ * 10.0);
 
-  /*
+  /* // Other camera modes.
   let camX = map(mouseX, 0, width, -200, 0);
   camera(camX, 0, (height/2)/tan(PI/6), camX, 0, 0, 0, 1, 0);
   */
@@ -187,41 +170,36 @@ function draw() {
   rotateX(frameCount * 0.01);
 
   */
+
 }
 
 function makeLawnWithEffects() {
-  //var vol = amp.getLevel();
-  //track_amplitude.push(vol);
-
-  rotateZ(planeAngle);
+  var vol = amp.getLevel();
   push();
   scale(1);
   noStroke();
   texture(grass_texture);
-  sphere(100, 50);
+  sphere(vol * 1000, 50, 50);
   pop();
 
 }
 
 function make3DEgg() {
   push();
-  let eggLoc = createVector(random(-200,200), random(-200,200), random(-200,200));
+  let eggLoc = createVector(random(-300,300), random(-300,300), random(-200,200));
   translate(eggLoc);
   scale(3);
   noStroke();
 
-  rotateX(rotationAngle);
-  rotateY(rotationAngle * 0.3);
-  rotateZ(rotationAngle * 1.2);
-  rotationAngle += 0.003;
+  rotateX(rotationAngle * 1.0);
+  rotateY(rotationAngle * 0.5);
+  rotateZ(rotationAngle * 0.7);
+  rotationAngle -= 0.005;
   
   //pass image as texture
-  //texture(egg_texture);
-  
-  texture(wordAcquired);
+  texture(egg_texture);
+
   model(three_d_egg);
-
-
   pop();
 }
 
@@ -229,6 +207,6 @@ function addWordsToCanvas() {
   push();
   let c = color(random(255),random(255),random(255));
   fill(c);
-  text(getEggText(), random(-300, 300), random(-300, 300));
+  text(getEggText(), random(-500, 500), random(-500, 500));
   pop();
 }
