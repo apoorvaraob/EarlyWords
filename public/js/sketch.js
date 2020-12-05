@@ -8,6 +8,12 @@ let baby_sounds;
 let egg_cracking;
 let amp;
 let track_amplitude = [];
+let rotationAngle = 1.0;
+let planeAngle = 1.0;
+let cam;
+let delta = 0.01;
+let wordAcquired;
+let background_image; 
 
 let tables = ['data/item_data.csv',
               'data/item_data-2.csv',
@@ -20,11 +26,17 @@ let tables = ['data/item_data.csv',
 p5.disableFriendlyErrors = true;
 
 function preload(){
-  
+
+  three_d_egg = loadModel('assets/3d_objects/white_egg_by_Andreas_Piel.obj');
+  //grass = loadModel('assets/3d_objects/grass_low_poly.obj');
+  egg_texture = loadImage('assets/3d_objects/egg_texture.png');
+  grass_texture = loadImage('assets/3d_objects/grass_texture.jpg');
+  //background_image = loadImage('assets/images/stock_characters.png');
+
   // Audio
   soundFormats('mp3');
-  baby_sounds = loadSound('assets/baby_babbling.mp3');
-  egg_cracking = loadSound('assets/eggs_cracking.mp3');
+  baby_sounds = loadSound('assets/sounds/baby_babbling.mp3');
+  egg_cracking = loadSound('assets/sounds/eggs_cracking.mp3');
 
   // Data
   for(i = 0; i < tables.length; i++){
@@ -32,7 +44,7 @@ function preload(){
   }
 
   // Latin based Fonts
-  //eggTextFont = loadFont('assets/fonts/pizza/PizzaismyFAVORITE.ttf');
+  eggTextFont = loadFont('assets/fonts/pizza/PizzaismyFAVORITE.ttf');
   //eggTextFont = loadFont('assets/fonts/kindergarden/Kindergarden.ttf');
   //eggTextFont = loadFont('assets/fonts/acki-preschool/AckiPreschool.ttf');
   //eggTextFont = loadFont('assets/fonts/two-turtle-doves/doves.ttf');
@@ -41,7 +53,9 @@ function preload(){
 }
 
 function setup() {
+
   console.log("pre load complete");
+
 
   // Start sound
   button = createButton("play");
@@ -49,12 +63,8 @@ function setup() {
   amp = new p5.Amplitude();
 
   // Start drawing
-  //createCanvas(640, 360);
-  createCanvas(windowWidth, windowHeight);
-  
-  for(i = 0; i < MAX_EGGS; i++){
-    eggs.push(new Egg(width * random(1), height * random(1), random(0.25), random(80)));
-  }
+  createCanvas(windowWidth, windowHeight-25, WEBGL);
+  //background_image.resize(windowWidth, windowHeight-25);
 
   // Get data
   for(i = 0; i < tables.length; i++){
@@ -65,8 +75,23 @@ function setup() {
   console.log(def_data);
 
   // Text
-  //textFont(eggTextFont);
-  textSize(20);
+  textFont(eggTextFont);
+  textSize(60);
+  
+  // non-interactive version. 
+  /*
+  cam = createCamera();
+  // set initial pan angle
+  cam.pan(-0.6);
+  */
+
+  wordAcquired = createGraphics(200, 200);
+  wordAcquired.background(egg_texture);
+  wordAcquired.fill(255, 100);
+  wordAcquired.textAlign(CENTER);
+  wordAcquired.textSize(20);
+  wordAcquired.text('new word', 100, 150); 
+  
 }
 
 function togglePlaying() {
@@ -93,13 +118,16 @@ function getEggText(){
   data = def_data[language];
 
   /*
-  if(language == 1 || language == 3 || language == 4 || language == 5 || language == 6){
+  if(language == 1 
+    || language == 3 
+    || language == 4 
+    || language == 5 
+    || language == 6){
     textFont(eggTextFont);
   } else {
     textFont();
   }
   */
-
   // Get around browser limitations
   if (index <= 100) {
     index++;
@@ -117,160 +145,90 @@ function getEggText(){
 
 function draw() {
 
-  background(255, 244, 79); // lemon yellow
-  //background(241, 228, 174); // dark sky blue
+  frameRate(5);
+  
+  //background(255, 244, 79); // lemon yellow
+  background(135, 206, 235); // sky blue
+  //background(background_image);
 
-  // Eggs
+  rectMode(CENTER);
+  ambientLight(255);
+  let locX = mouseX - width / 2;
+  let locY = mouseY - height / 2;
+  pointLight(250, 250, 250, locX, locY, 50);
+
   for (i = 0; i< MAX_EGGS; i++){
-    eggs[i].transmit();
+    make3DEgg();
+    //makeLawnWithEffects();
+    addWordsToCanvas();
   }
 
   // Lawn
-  plotSoundVisualization();
+  makeLawnWithEffects();
+
+  // zoom in and out with mouse movement along X axis
+  let fov = map(mouseX, 0, width, 0, PI);
+  let cameraZ = (height / 2.0)/ tan ((PI/3)/2);
+  perspective(fov, width / height, cameraZ / 10.0, cameraZ * 10.0);
+
+  /*
+  let camX = map(mouseX, 0, width, -200, 0);
+  camera(camX, 0, (height/2)/tan(PI/6), camX, 0, 0, 0, 1, 0);
+  */
+
+  /*
+  // pan camera according to angle 'delta'
+  cam.pan(delta);
+
+  // every 160 frames, switch direction
+  if (frameCount % 100 === 0) {
+    delta *= -1;
+  }
+  rotateX(frameCount * 0.01);
+
+  */
+}
+
+function makeLawnWithEffects() {
+  //var vol = amp.getLevel();
+  //track_amplitude.push(vol);
+
+  rotateZ(planeAngle);
+  push();
+  scale(1);
+  noStroke();
+  texture(grass_texture);
+  sphere(100, 50);
+  pop();
 
 }
 
-function plotSoundVisualization() {
-  var vol = amp.getLevel();
-  track_amplitude.push(vol);
-  //stroke(14, 164, 79);
-  stroke(101, 163, 52);
-  strokeWeight(3);
-  beginShape();
+function make3DEgg() {
+  push();
+  let eggLoc = createVector(random(-200,200), random(-200,200), random(-200,200));
+  translate(eggLoc);
+  scale(3);
+  noStroke();
 
-  // Use amplitude to determine the height of the grass
-  for (var i = 0; i < track_amplitude.length; i++) {
-    fill(154, 195, 69);
-    var y = map(track_amplitude[i], 0, 1, height, 0);
-    vertex(i, y);
-  }
-  endShape();
-
-  if(track_amplitude.length > width) {
-    // Get rid of the oldest point and add 
-    // a new one when we reach the end of the canvas
-    track_amplitude.splice(0, 1);
-  }
+  rotateX(rotationAngle);
+  rotateY(rotationAngle * 0.3);
+  rotateZ(rotationAngle * 1.2);
+  rotationAngle += 0.003;
   
-  stroke(123, 41, 167);
-
-  // vertical line marks where we are. 
-  line(track_amplitude.length, 0, track_amplitude.length, height);
+  //pass image as texture
+  //texture(egg_texture);
   
-  //ellipse(100, 100, 200, vol*200);
+  texture(wordAcquired);
+  model(three_d_egg);
+
+
+  pop();
 }
 
-class Egg {
-  constructor(xpos, ypos, t, s) {
-    this.x = xpos;
-    this.y = ypos;
-    this.tilt = t;
-    this.scalar = s / 100.0;
-    this.angle = 0.0;
-    this.cracked = false;
-    this.hatched = false;
-    this.wobbling = true;
-    this.tiltRight = 0.2;
-    this.tiltLeft = -0.2;
-    this.eggText = "";
-
-  }
-
-  wobble() {
-
-    this.tilt = cos(this.angle) / 4;
-    this.angle += 0.2;
-    
-  }
-
-  
-  crack() {
-
-    push();
-    this.wobbling = false;
-    this.cracked = true;
-    pop();
-    
-  }
-
-  hatch() {
-
-    push();
-
-    if(this.cracked){
-      this.tiltRight = cos(this.angle + random(1)) / 4;
-      this.tiltLeft = -cos(this.angle + random(1)) / 4;
-
-    }
-    this.cracked = true;
-    this.hatched = true;
-    this.wobbling = false;
-    
-    let c = color(random(255),random(255),random(255));
-    fill(c);
-    this.eggText = getEggText();
-    text(this.eggText, this.x - 15, this.y - 25);
-
-    pop();
-
-
-  }
-
-  display() {
-    noStroke();
-    let c = color(255);
-    fill(c); 
-    push();
-    this.eggText = "";
-    translate(this.x, this.y);
-    rotate(this.tilt);
-    scale(this.scalar);
-    beginShape();
-    rotate(this.tiltLeft);
-    
-    vertex(0, -100);
-    bezierVertex(25, -100, 40, -65, 40, -40);
-    bezierVertex(40, -15, 25, 0, 0, 0);  
-    vertex(0, 0); 
-    vertex(15, -15);
-    vertex(-10, -30); 
-    vertex(20, -50);
-    vertex(-13, -63);
-    vertex(0,-100); 
-    endShape();
-
-    rotate(this.tiltRight);
-    beginShape();
-    vertex(0, 0);
-    bezierVertex(-25, 0, -40, -15, -40, -40);
-    bezierVertex(-40, -65, -25, -100, 0, -100);
-    vertex(0, 0);
-    vertex(15, -15);
-    vertex(-10, -30); 
-    vertex(20, -50);
-    vertex(-13, -63);
-    vertex(0, -100);
-
-    erase();
-    vertex(0, 0);
-    vertex(0, -100);
-    noErase();
-    
-    endShape();
-
-    this.cracked = false;
-    this.hatched = false;
-
-    pop();
-
-
-  }
-
-  transmit() {
-    frameRate(5);
-    this.wobble();
-    this.display();
-    this.crack();
-    this.hatch(); 
-    }
+function addWordsToCanvas() {
+  push();
+  let c = color(random(255),random(255),random(255));
+  fill(c);
+  text(getEggText(), random(-300, 300), random(-300, 300));
+  pop();
 }
