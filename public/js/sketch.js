@@ -59,7 +59,6 @@ function setup() {
 
   // Start drawing
   createCanvas(windowWidth, windowHeight-25, WEBGL);
-  //background_image.resize(windowWidth, windowHeight-25);
 
   // Get data
   for(i = 0; i < tables.length; i++){
@@ -87,6 +86,23 @@ function setup() {
   //wordAcquired.textSize(20);
   //wordAcquired.text('new word', 100, 150); 
   
+  let title = createP('Early Words');
+  let shortIntro = createP('\'Early words\' is an abstract model of the fascinating language acquisition process of 18 to 36 month olds. It aims to cast light on word comprehension and production. The data used is intentionally cross-linguistic to serve as a reminder that multiple languages can be acquired simultaneously in the same abstract space of the mind and be enriched by it. ');
+  let description = createP('This piece is an encounter with human first sounds and words. The words displayed are filtered by age, but not by language.  Eggs hatch to reveal words acquired by the hypothetical multilingual toddler. The words occupy a space above the grassy globe made out of the sounds of babbling. Today, out of approximately seven thousand known languages, only a handful are dominant. Words from all languages are valued equally in this abstract space.'); 
+  let dataSource = createP('Primary data source: Frank, M. C., Braginsky, M., Yurovsky, D., & Marchman, V. A. (2016). Wordbank: An open repository for developmental vocabulary data. Journal of Child Language. doi: 10.1017/S0305000916000209.');
+  let howToInteract = createP('The animation will begin as soon as you open the window. To interact with the app, use your mouse pointer to change the direction of a point light source. Move the mouse pointer horizontally to step away from and towards the scene. Click the play button to hear babbling and watch the globe change in size according to the volume.');
+
+  title.class('title');
+  shortIntro.class('artInfo');
+  description.class('artInfo');
+  dataSource.class('artInfo');
+  howToInteract.class('artInfo');
+
+  //OLD version
+  //URL: https://shrouded-woodland-95521.herokuapp.com. There's a play and pause button for the sound and some animation, though it mostly runs in a p5.js loop. 
+  
+  //NEW version
+  //URL: https://still-island-32738.herokuapp.com/. 
 }
 
 function togglePlaying() {
