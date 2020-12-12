@@ -1,4 +1,4 @@
-# FirstWords
+# EarlyWords
 
 Early Words  ‘Early words' is an abstract model of the fascinating language acquisition process of 18 to 36 month olds. It aims to cast light on word comprehension and production. The data used is intentionally cross-linguistic to serve as a reminder that multiple languages can be acquired simultaneously in the same abstract space of the mind and be enriched by it.
 
