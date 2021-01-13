@@ -12,7 +12,6 @@ let rotationAngle = 1.0;
 let cam;
 let delta = 0.01;
 let wordAcquired;
-let background_image; 
 
 let tables = ['data_Stanford_WordBank_Nov2020/kigiriama.csv', //1
               'data_Stanford_WordBank_Nov2020/chinese.csv', //2
@@ -29,7 +28,6 @@ function preload(){
   three_d_egg = loadModel('assets/3d_objects/white_egg_by_Andreas_Piel.obj');
   egg_texture = loadImage('assets/3d_objects/egg_texture.png');
   grass_texture = loadImage('assets/3d_objects/grass_texture.jpg');
-  background_image = loadImage('assets/images/stock_characters.png');
 
   // Audio
   soundFormats('mp3');
