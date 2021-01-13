@@ -42,7 +42,7 @@ function preload(){
   }
 
   // Japanese fonts for the most coverage
-  //eggTextFont = loadFont('assets/fonts/Noto_Sans_JP/NotoSansJP-Light.otf');
+  // eggTextFont = loadFont('assets/fonts/Noto_Sans_JP/NotoSansJP-Light.otf');
   eggTextFont = loadFont('assets/fonts/chi_jyun/ちはや純.ttf')
 
 }
@@ -50,7 +50,6 @@ function preload(){
 function setup() {
 
   console.log("pre load complete");
-
 
   // Start sound
   button = createButton("play");
@@ -78,13 +77,6 @@ function setup() {
   // set initial pan angle
   cam.pan(-0.6);
   */
-
-  //wordAcquired = createGraphics(200, 200);
-  //wordAcquired.background(background_image);
-  //wordAcquired.fill(255, 100);
-  //wordAcquired.textAlign(CENTER);
-  //wordAcquired.textSize(20);
-  //wordAcquired.text('new word', 100, 150); 
   
   let title = createP('Early Words');
   let shortIntro = createP('Early Words is an abstract model of the fascinating language acquisition process of 18 to 36 month olds. It aims to cast light on word comprehension and production. The data used is intentionally cross-linguistic to serve as a reminder that multiple languages can be acquired simultaneously in the same abstract space of the mind and be enriched by it. ');
@@ -92,6 +84,7 @@ function setup() {
   let dataSource = createP('Primary data source: Frank, M. C., Braginsky, M., Yurovsky, D., & Marchman, V. A. (2016). Wordbank: An open repository for developmental vocabulary data. Journal of Child Language. doi: 10.1017/S0305000916000209.');
   let howToInteract = createP('The animation will begin as soon as you open the window. To interact with the app, use your mouse pointer to change the direction of a point light source. Move the mouse pointer horizontally to step away from and towards the scene. Click the play button to hear babbling and watch the globe change in size according to the volume.');
   let artist = createP('Artist: Apoorva Rao Balevalachilu for the GrayArea Winter 2019 Showcase.');
+  
   title.class('title');
   shortIntro.class('artInfo');
   description.class('artInfo');
@@ -151,7 +144,6 @@ function draw() {
   
   //background(255, 244, 79); // lemon yellow
   background(135, 206, 235); // sky blue
-  //background(background_image); // won't work in 3D. 
 
   rectMode(CENTER);
   ambientLight(255);
@@ -192,6 +184,7 @@ function draw() {
 }
 
 function makeLawnWithEffects() {
+  // earth 
   var vol = amp.getLevel();
   push();
   scale(1);
@@ -203,25 +196,23 @@ function makeLawnWithEffects() {
 }
 
 function make3DEgg() {
+  // eggs
   push();
   let eggLoc = createVector(random(-300,300), random(-300,300), random(-200,200));
   translate(eggLoc);
   scale(3);
   noStroke();
-
   rotateX(rotationAngle * 1.0);
   rotateY(rotationAngle * 0.5);
   rotateZ(rotationAngle * 0.7);
   rotationAngle -= 0.005;
-  
-  //pass image as texture
   texture(egg_texture);
-
   model(three_d_egg);
   pop();
 }
 
 function addWordsToCanvas() {
+  // words
   push();
   let c = color(random(255),random(255),random(255));
   fill(c);
