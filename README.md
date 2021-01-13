@@ -8,6 +8,6 @@ Primary data source: Frank, M. C., Braginsky, M., Yurovsky, D., & Marchman, V. A
 
 The animation will begin as soon as you open the window. To interact with the app, use your mouse pointer to change the direction of a point light source. Move the mouse pointer horizontally to step away from and towards the scene. Click the play button to hear babbling and watch the globe change in size according to the volume.
 
-Artist: Apoorva Rao Balevalachilu for the GrayArea Winter 2019 Showcase.
+Artist: Apoorva Rao Balevalachilu for the GrayArea Winter 2020 Showcase.
 
 To see the artwork in the virtual gallery, please visit: https://grayarea.org/event/gray-area-artist-winter-showcase-2020/
